@@ -394,9 +394,7 @@ const PRODUCTS = {
     "SOLEN AMADA STIX MILK CHOCOLATE 4004 [4x12x40gm]",
     "SOLEN AMADA STIX HAZELNUT 4003 [4x12x32gm]",
     "SOLEN AMADA STIX COCONUT 4002 [4x12x32gm]"
-  ],
-
-  "Brand 3": ["SKU 3A", "SKU 3B", "SKU 3C", "SKU 3D"],
+  ]
   
 }
 
