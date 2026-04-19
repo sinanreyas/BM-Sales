@@ -1873,10 +1873,11 @@ function App() {
   const [loading, setLoading]                   = useState(false)
 
 
-  function handleProductToggle(skuName) {
+  function handleProductToggle(brand, skuName) {
+    const key = `${brand}||${skuName}`
     setProducts({
       ...products,
-      [skuName]: !products[skuName]
+      [key]: !products[key]
     })
   }
 
@@ -1930,11 +1931,10 @@ function App() {
     // build one object where each brand name is a key
     // and its value is a comma separated string of checked SKUs
     const brandColumns = {}
-    Object.entries(PRODUCTS).forEach(([brand, skus]) => {
-      const checkedSkus = skus.filter((sku) => !!products[sku])
-      // if nothing checked for this brand, save empty string
-      brandColumns[brand] = checkedSkus.join(", ")
-    })
+Object.entries(PRODUCTS).forEach(([brand, skus]) => {
+  const checkedSkus = skus.filter((sku) => !!products[`${brand}||${sku}`])
+  brandColumns[brand] = checkedSkus.join(", ")
+})
   
     // the final row looks like:
     // { salesman: "Ahmed", week: "Week 1", day: "Monday", date: "18/04/2026",
@@ -2065,9 +2065,9 @@ function App() {
             {/* brand pill tabs */}
             <div className="brand-tabs">
               {brandNames.map((brand) => {
-                const checkedInBrand = PRODUCTS[brand].filter(sku => !!products[sku]).length
-                const isActive       = selectedBrand === brand
-                const hasChecks      = checkedInBrand > 0
+                const checkedInBrand = PRODUCTS[brand].filter(
+                  sku => !!products[`${brand}||${sku}`]
+                ).length
 
                 return (
                   <button
@@ -2095,25 +2095,28 @@ function App() {
                 </div>
 
                 <div className="products-grid">
-                  {PRODUCTS[selectedBrand].map((sku) => (
-                    <label
-                      key={sku}
-                      className={`product-item ${products[sku] ? "checked" : ""}`}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={!!products[sku]}
-                        onChange={() => handleProductToggle(sku)}
-                      />
-                      <div className="custom-check">
-                        <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-                          <path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
-                      </div>
-                      <span className="product-name">{sku}</span>
-                    </label>
-                  ))}
-                </div>
+  {PRODUCTS[selectedBrand].map((sku) => {
+    const key = `${selectedBrand}||${sku}`
+    return (
+      <label
+        key={key}
+        className={`product-item ${products[key] ? "checked" : ""}`}
+      >
+        <input
+          type="checkbox"
+          checked={!!products[key]}
+          onChange={() => handleProductToggle(selectedBrand, sku)}
+        />
+        <div className="custom-check">
+          <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+            <path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </div>
+        <span className="product-name">{sku}</span>
+      </label>
+    )
+  })}
+</div>
               </>
             )}
 
