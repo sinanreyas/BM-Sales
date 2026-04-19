@@ -327,10 +327,11 @@ const PRODUCTS = {
   ],
   "DCL / SAF": [
     "Active Dried Yeast",
-    "Instant Yeast",
-    "Instant Yeast Saf Active Dry Yeast Tin",
-    "Saf Active Dry Yeast Pack",
-    "Saf Active Dry Yeast Pack",
+    "Instant Yeast 20x500gm",
+    "Instant Yeast 20x12x4x11",
+    "Saf Active Dry Yeast Tin",
+    "Saf Active Dry Yeast Pack 3x12x125gm",
+    "Saf Active Dry Yeast Pack 20x500gm",
     "Saf Active Dry Yeast"
   ],
   "Dunar": [
