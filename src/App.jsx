@@ -158,8 +158,8 @@ const PRODUCTS = {
     "VOIZ BITS MINI COOKIES CHOCO CREAM 20GX10 (200G)"
   ],
   "Vicenzi": [
-    "Vicenzi Long Finger",
-    "Vicenzi Long Finger",
+    "Vicenzi Long Finger 12x200gm",
+    "Vicenzi Long Finger 6x400gm",
     "Vicenzi Brkfast 300gm",
     "VICENZI MV ASSORT PASTICCINI (10x250g)",
     "Vicenzi Cantuccini In Bag",
@@ -334,16 +334,16 @@ const PRODUCTS = {
     "Saf Active Dry Yeast"
   ],
   "Dunar": [
-    "DUNAR RICE-ELONGA",
-    "DUNAR RICE-ELONGA",
-    "DUNAR RICE-ELONGA",
-    "DUNAR RICE-FESTIVA",
-    "DUNAR RICE-FESTIVA",
-    "DUNAR RICE-FESTIVA",
-    "DUNAR RICE-FUSION",
-    "DUNAR RICE-FUSION",
-    "DUNAR RICE-LEGACY",
-    "DUNAR RICE-NUTRITIA BROWN"
+    "DUNAR RICE-ELONGA 2x10KG",
+    "DUNAR RICE-ELONGA 4x5KG",
+    "DUNAR RICE-ELONGA 20X1KG",
+    "DUNAR RICE-FESTIVA 2x10KG",
+    "DUNAR RICE-FESTIVA 4x5KG",
+    "DUNAR RICE-FESTIVA 20X1KG",
+    "DUNAR RICE-FUSION 4X10KG",
+    "DUNAR RICE-FUSION 4X5KG",
+    "DUNAR RICE-LEGACY 4x5KG",
+    "DUNAR RICE-NUTRITIA BROWN 4x5KG"
   ],
   "Delicio": [
     "DELICIO 1000 ISLAND DRESSING - 12 X 267 ML",
@@ -2069,18 +2069,20 @@ Object.entries(PRODUCTS).forEach(([brand, skus]) => {
                   sku => !!products[`${brand}||${sku}`]
                 ).length
 
-                return (
-                  <button
-                    key={brand}
-                    className={`brand-tab ${isActive ? "active" : ""} ${hasChecks ? "has-checks" : ""}`}
-                    onClick={() => setSelectedBrand(brand)}
-                  >
-                    {brand}
-                    {hasChecks && (
-                      <span className="brand-tab-badge">{checkedInBrand}</span>
-                    )}
-                  </button>
-                )
+                const isActive  = selectedBrand === brand
+const hasChecks = checkedInBrand > 0
+return (
+  <button
+    key={brand}
+    className={`brand-tab ${isActive ? "active" : ""} ${hasChecks ? "has-checks" : ""}`}
+    onClick={() => setSelectedBrand(brand)}
+  >
+    {brand}
+    {hasChecks && (
+      <span className="brand-tab-badge">{checkedInBrand}</span>
+    )}
+  </button>
+)
               })}
             </div>
 
@@ -2090,7 +2092,7 @@ Object.entries(PRODUCTS).forEach(([brand, skus]) => {
                 <div className="products-header">
                   <span className="products-title">{selectedBrand}</span>
                   <span className="products-count">
-                    {PRODUCTS[selectedBrand].filter(sku => !!products[sku]).length} / {PRODUCTS[selectedBrand].length} checked
+                  {PRODUCTS[selectedBrand].filter(sku => !!products[`${selectedBrand}||${sku}`]).length} / {PRODUCTS[selectedBrand].length} checked
                   </span>
                 </div>
 
