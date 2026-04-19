@@ -8,7 +8,7 @@ const SALESMEN = [
   "Nabin",
   "Shaji",
   "Arshad",
-  "Shabib",
+  "Shabeeb",
   "Imtiaz",
 ]
 
@@ -1358,7 +1358,7 @@ const SCHEDULE = {
     ]
   }
   },
-  ARSHAD: {
+  Arshad: {
     "Week 1": {
       Monday: [
         "WAHAT KALABA DISCOUNT",
@@ -1569,7 +1569,7 @@ const SCHEDULE = {
       ]
     }
   },
-  SHABEEB: {
+  Shabeeb: {
     "Week 1": {
     Monday: [
       "PLUS POINT SUPERMARKET",
