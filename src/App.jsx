@@ -2072,6 +2072,7 @@ function App() {
   const [selectedBrand, setSelectedBrand]       = useState("")
   const [comments, setComments]                 = useState("")
   const [products, setProducts]                 = useState({})
+  const [submittedStores, setSubmittedStores]   = useState([])
   const [toast, setToast]                       = useState(false)
   const [loading, setLoading]                   = useState(false)
 
@@ -2094,6 +2095,7 @@ function App() {
 
   function handleSalesmanChange(name) {
     setSelectedSalesman(name)
+    setSubmittedStores([]) 
     setSelectedWeek("")
     setSelectedDay("")
     setSelectedStore("")
@@ -2116,6 +2118,7 @@ function App() {
     setSelectedStore("")
     setSelectedBrand("")
     setProducts({})
+    setSubmittedStores([]) 
   }
 
 
@@ -2163,6 +2166,7 @@ Object.entries(PRODUCTS).forEach(([brand, skus]) => {
   
     setToast(true)
     setTimeout(() => setToast(false), 3000)
+    setSubmittedStores([...submittedStores, selectedStore])
     setSelectedStore("")
     setSelectedBrand("")
     setProducts({})
@@ -2236,7 +2240,30 @@ Object.entries(PRODUCTS).forEach(([brand, skus]) => {
           </div>
         )}
 
-
+        {selectedDay && submittedStores.length > 0 && (
+          <div className="card">
+            <div className="step-label">Submitted today</div>
+            {submittedStores.map((store, index) => (
+              <div
+                key={index}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  padding: "8px 0",
+                  borderBottom: "1px solid var(--border)",
+                  fontSize: "13px",
+                  color: "#6fcf6f",
+                }}
+              >
+                <svg width="14" height="14" viewBox="0 0 10 8" fill="none">
+                  <path d="M1 4L3.5 6.5L9 1" stroke="#6fcf6f" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                {store}
+              </div>
+            ))}
+          </div>
+        )}
         {/* ── STEP 4: STORE ── */}
         {selectedDay && availableStores.length > 0 && (
           <div className="card">
