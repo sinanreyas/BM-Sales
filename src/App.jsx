@@ -2064,7 +2064,7 @@ const DAYS  = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday
 
 
 function App() {
-
+  const [isManager, setIsManager]               = useState(false)
   const [selectedSalesman, setSelectedSalesman] = useState("")
   const [selectedWeek, setSelectedWeek]         = useState("")
   const [selectedDay, setSelectedDay]           = useState("")
@@ -2075,6 +2075,12 @@ function App() {
   const [submittedStores, setSubmittedStores]   = useState([])
   const [toast, setToast]                       = useState(false)
   const [loading, setLoading]                   = useState(false)
+  const [managerSalesman, setManagerSalesman] = useState("")
+  const [managerWeek, setManagerWeek]         = useState("")
+  const [managerDay, setManagerDay]           = useState("")
+  const [visitedStores, setVisitedStores]     = useState([])
+  const [managerLoading, setManagerLoading]   = useState(false)
+  
 
 
   function handleProductToggle(brand, skuName) {
@@ -2083,6 +2089,30 @@ function App() {
       ...products,
       [key]: !products[key]
     })
+  }
+  async function fetchVisitedStores() {
+    if (!managerSalesman || !managerWeek || !managerDay) return
+  
+    setManagerLoading(true)
+  
+    // fetch all submissions for this salesman + week + day
+    const { data, error } = await supabase
+      .from("submissions")
+      .select("store")
+      .eq("salesman", managerSalesman)
+      .eq("week", managerWeek)
+      .eq("day", managerDay)
+  
+    setManagerLoading(false)
+  
+    if (error) {
+      alert("Error fetching data: " + error.message)
+      return
+    }
+  
+    // extract just the store names into an array
+    const visited = data.map((row) => row.store)
+    setVisitedStores(visited)
   }
 
 
@@ -2185,6 +2215,34 @@ Object.entries(PRODUCTS).forEach(([brand, skus]) => {
         <img src={logo} alt="Baqer Mohebi Enterprises" />
         <div className="header-divider" />
         <span className="header-title">Store Tracker</span>
+        <button
+  onClick={() => {
+    if (isManager) {
+      setIsManager(false)
+    } else {
+      const password = prompt("Enter manager password:")
+      if (password === "siman") {
+        setIsManager(true)
+      } else if (password !== null) {
+        alert("Incorrect password")
+      }
+    }
+  }}
+  style={{
+    marginLeft: "auto",
+    background: isManager ? "var(--red)" : "var(--surface-2)",
+    border: "1px solid var(--border)",
+    color: isManager ? "#fff" : "var(--muted)",
+    padding: "7px 16px",
+    borderRadius: "6px",
+    fontFamily: "Barlow, sans-serif",
+    fontSize: "13px",
+    fontWeight: "600",
+    cursor: "pointer",
+  }}
+>
+  {isManager ? "Exit" : "Management Access"}
+</button>
       </header>
 
       <main className="page">
@@ -2388,6 +2446,199 @@ return (
         )}
 
       </main>
+      {/* ── MANAGER VIEW ── */}
+{isManager && (
+  <div style={{
+    position: "fixed",
+    top: 0, left: 0, right: 0, bottom: 0,
+    background: "var(--bg)",
+    overflowY: "auto",
+    zIndex: 100,
+    padding: "24px",
+  }}>
+
+    {/* header */}
+    <div style={{
+      display: "flex",
+      alignItems: "center",
+      marginBottom: "24px",
+      gap: "16px"
+    }}>
+      <h2 style={{
+        fontFamily: "Barlow Condensed, sans-serif",
+        fontSize: "22px",
+        fontWeight: "700",
+        letterSpacing: "0.08em",
+        textTransform: "uppercase",
+      }}>
+        Manager View
+      </h2>
+      <button
+        onClick={() => setIsManager(false)}
+        style={{
+          marginLeft: "auto",
+          background: "var(--surface-2)",
+          border: "1px solid var(--border)",
+          color: "var(--muted)",
+          padding: "7px 16px",
+          borderRadius: "6px",
+          fontFamily: "Barlow, sans-serif",
+          fontSize: "13px",
+          cursor: "pointer",
+        }}
+      >
+        Close
+      </button>
+    </div>
+
+    {/* filters */}
+    <div style={{ maxWidth: "560px", margin: "0 auto" }}>
+      <div className="card">
+        <div className="step-label">Select filters</div>
+
+        <label>Salesman</label>
+        <select
+          value={managerSalesman}
+          onChange={(e) => {
+            setManagerSalesman(e.target.value)
+            setVisitedStores([])
+          }}
+          style={{ marginBottom: "12px" }}
+        >
+          <option value="">— Select salesman —</option>
+          {SALESMEN.map((name) => (
+            <option key={name} value={name}>{name}</option>
+          ))}
+        </select>
+
+        <label>Week</label>
+        <select
+          value={managerWeek}
+          onChange={(e) => {
+            setManagerWeek(e.target.value)
+            setVisitedStores([])
+          }}
+          style={{ marginBottom: "12px" }}
+        >
+          <option value="">— Select week —</option>
+          {WEEKS.map((week) => (
+            <option key={week} value={week}>{week}</option>
+          ))}
+        </select>
+
+        <label>Day</label>
+        <select
+          value={managerDay}
+          onChange={(e) => {
+            setManagerDay(e.target.value)
+            setVisitedStores([])
+          }}
+          style={{ marginBottom: "16px" }}
+        >
+          <option value="">— Select day —</option>
+          {DAYS.map((day) => (
+            <option key={day} value={day}>{day}</option>
+          ))}
+        </select>
+
+        <button
+          className="submit-btn"
+          onClick={fetchVisitedStores}
+          disabled={!managerSalesman || !managerWeek || !managerDay || managerLoading}
+        >
+          {managerLoading ? "Loading..." : "Check Coverage"}
+        </button>
+      </div>
+
+      {/* results */}
+      {visitedStores.length > 0 && managerSalesman && managerWeek && managerDay && (() => {
+
+        const assigned = SCHEDULE[managerSalesman]?.[managerWeek]?.[managerDay] || []
+        const notVisited = assigned.filter(store => !visitedStores.includes(store))
+        const visited = assigned.filter(store => visitedStores.includes(store))
+
+        return (
+          <>
+            {/* summary bar */}
+            <div className="card" style={{ display: "flex", gap: "24px" }}>
+              <div>
+                <div style={{ fontSize: "28px", fontWeight: "700", color: "#6fcf6f" }}>
+                  {visited.length}
+                </div>
+                <div style={{ fontSize: "12px", color: "var(--muted)" }}>Visited</div>
+              </div>
+              <div>
+                <div style={{ fontSize: "28px", fontWeight: "700", color: "var(--red)" }}>
+                  {notVisited.length}
+                </div>
+                <div style={{ fontSize: "12px", color: "var(--muted)" }}>Not Visited</div>
+              </div>
+              <div>
+                <div style={{ fontSize: "28px", fontWeight: "700", color: "var(--text)" }}>
+                  {assigned.length}
+                </div>
+                <div style={{ fontSize: "12px", color: "var(--muted)" }}>Total Assigned</div>
+              </div>
+            </div>
+
+            {/* not visited list */}
+            {notVisited.length > 0 && (
+              <div className="card">
+                <div className="step-label" style={{ color: "var(--red)" }}>
+                  Not Visited ({notVisited.length})
+                </div>
+                {notVisited.map((store, i) => (
+                  <div key={i} style={{
+                    padding: "10px 0",
+                    borderBottom: "1px solid var(--border)",
+                    fontSize: "13px",
+                    color: "var(--text)",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "10px",
+                  }}>
+                    <div style={{
+                      width: "8px", height: "8px",
+                      borderRadius: "50%",
+                      background: "var(--red)",
+                      minWidth: "8px",
+                    }} />
+                    {store}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* visited list */}
+            {visited.length > 0 && (
+              <div className="card">
+                <div className="step-label" style={{ color: "#6fcf6f" }}>
+                  Visited ({visited.length})
+                </div>
+                {visited.map((store, i) => (
+                  <div key={i} style={{
+                    padding: "10px 0",
+                    borderBottom: "1px solid var(--border)",
+                    fontSize: "13px",
+                    color: "#6fcf6f",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "10px",
+                  }}>
+                    <svg width="14" height="14" viewBox="0 0 10 8" fill="none">
+                      <path d="M1 4L3.5 6.5L9 1" stroke="#6fcf6f" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                    {store}
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
+        )
+      })()}
+    </div>
+  </div>
+)}
 
       {/* ── SUCCESS TOAST ── */}
       {toast && (
