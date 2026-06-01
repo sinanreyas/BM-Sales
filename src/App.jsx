@@ -10,6 +10,7 @@ const SALESMEN = [
   "Arshad",
   "Shabeeb",
   "Imtiaz",
+  "Sharook"
 ]
 
 // Each key is a brand, each value is an array of SKUs under that brand
